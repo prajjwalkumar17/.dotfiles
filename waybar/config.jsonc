@@ -17,21 +17,10 @@
     "tray",
   ],
 
-  "modules-center": ["custom/player"],
-
   "modules-right": [
     "pulseaudio",
-    "custom/backlight",
-    "hyprland/language",
-    "custom/paddc",
-    "custom/paddc",
-    "bluetooth",
-    // "custom/paddc",
-    "battery",
     "custom/paddc",
     "custom/notification",
-    "custom/paddc",
-    "custom/wifi",
     "custom/paddc",
     "clock#date",
     "custom/paddc",
