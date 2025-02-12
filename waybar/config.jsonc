@@ -68,11 +68,11 @@
     }
   },
 
-  "tray": {
-    "icon-size": 15,
-    "spacing": 8
-  },
-
+  // "tray": {
+  //   "icon-size": 15,
+  //   "spacing": 8
+  // },
+  //
   "pulseaudio": {
     // "scroll-step": 1, // %, can be a float
     "format": "<span color='#fbf1c7' >  </span>{volume}%",
