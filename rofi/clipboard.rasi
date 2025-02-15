@@ -1,0 +1,114 @@
+// Config //
+configuration {
+    modi:                        "drun";
+    show-icons:                  false;
+}
+
+// Main //
+window {
+    width:                       23em;
+    height:                      30em;
+    transparency:                "real";
+    fullscreen:                  false;
+    enabled:                     true;
+    cursor:                      "default";
+    spacing:                     0em;
+    padding:                     0em;
+    border-color:                #7C6F64;
+    background-color:            #282828;
+}
+
+mainbox {
+    enabled:                     true;
+    spacing:                     0em;
+    padding:                     0.5em;
+    orientation:                 vertical;
+    children:                    [ "wallbox" , "listbox" ];
+    background-color:            transparent;
+}
+
+wallbox {
+    spacing:                     0em;
+    padding:                     0em;
+    expand:                      false;
+    orientation:                 horizontal;
+    background-color:            transparent;
+    background-image:            url("~/Wallpaper/tech.png", width);
+    children:                    [ "wallframe" , "inputbar" ];
+}
+
+wallframe {
+    width:                       5em;
+    spacing:                     0em;
+    padding:                     0em;
+    expand:                      false;
+    background-color:            #282828;
+    background-image:            url("~/Wallpaper/tech.png", width);
+}
+
+// Inputs //
+inputbar {
+    enabled:                     true;
+    padding:                     0em;
+    children:                    [ "entry" ];
+    background-color:            #282828;
+    expand:                      true;
+}
+
+entry {
+    enabled:                     true;
+    padding:                     1.8em;
+    text-color:                  #ffffff;  // White text
+    background-color:            transparent;
+}
+
+// Lists //
+listbox {
+    spacing:                     0em;
+    padding:                     0em;
+    orientation:                 vertical;
+    children:                    [ "dummy" , "listview" , "dummy" ];
+    background-color:            transparent;
+}
+
+listview {
+    enabled:                     true;
+    padding:                     0.5em;
+    columns:                     1;
+    lines:                       11; 
+    cycle:                       true;
+    fixed-height:                true;
+    fixed-columns:               false;
+    expand:                      false;
+    cursor:                      "default";
+    background-color:            transparent;
+    text-color:                  #ffffff;  // White text
+}
+
+dummy {
+    spacing:                     0em;
+    padding:                     0em;
+    background-color:            transparent;
+}
+
+// Elements //
+element {
+    enabled:                     true;
+    padding:                     0.5em;
+    cursor:                      pointer;
+    background-color:            transparent;
+    text-color:                  #ffffff;  // White text
+}
+
+element selected.normal {
+    background-color:            #98971a;  // Gruvbox green for selection
+    text-color:                  #000000;  // Black text for contrast
+}
+
+element-text {
+    vertical-align:              0.0;
+    horizontal-align:            0.0;
+    cursor:                      inherit;
+    background-color:            transparent;
+    text-color:                  inherit;
+}
