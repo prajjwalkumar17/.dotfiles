@@ -1,13 +1,14 @@
 #!/usr/bin/env bash
 
-confDir="$HOME/.config/rofi/"
+confDir="$HOME/.config"
+roconf="$confDir/rofi/clipboard.rasi"
+echo "Using theme: ${roconf}"
 hypr_border=${hypr_border:-0}
 hypr_width=${hypr_width:-1}
 rofiScale=10
 # Set variables
 scrDir=$(dirname "$(realpath "$0")")
 # source "$scrDir/globalcontrol.sh"
-roconf="${confDir}/rofi/clipboard.rasi"
 favoritesFile="${HOME}/.cliphist_favorites"
 
 # Set rofi scaling

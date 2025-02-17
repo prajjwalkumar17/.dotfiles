@@ -1,0 +1,1 @@
+bindsym $mainMod+L exec systemd-run --user --scope ~/.config/scripts/lockscreen.sh
