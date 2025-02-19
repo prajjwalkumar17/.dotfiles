@@ -1,8 +1,4 @@
 { config, pkgs, ... }:
-let
-  moz-overlay = import (builtins.fetchTarball https://github.com/mozilla/nixpkgs-mozilla/archive/master.tar.gz);
-  nixpkgs = import <nixpkgs> { overlays = [ moz-overlay ]; };
-in
 {
   # Home Manager needs a bit of information about you and the paths it should
   # manage.
@@ -47,15 +43,20 @@ in
     python3Packages.pip
     rustup
 
-    # Complete Rust toolchain
-    # nixpkgs.latest.rustChannels.stable.rust  # Changed this line
-    # Build essentials
-    # binutils  # Provides ld
-    # lld       # LLVM linker
+    # nvim
+    fzf
+    gnumake
+    libtool
+    neovim
+    pkg-config
+    ripgrep
+    jdt-language-server
+    vimPlugins.telescope-fzf-native-nvim
 
     # Common build dependencies
-    # clang
     cmake
+    lld
+    llvm
     gcc
     openssl
     pkg-config
@@ -76,6 +77,8 @@ in
     # # the Nix store. Activating the configuration will then make '~/.screenrc' a
     # # symlink to the Nix store copy.
     # ".screenrc".source = dotfiles/screenrc;
+    ".p10k.zsh".source = ~/.config/.p10k.zsh;
+
 
     # # You can also set the file content immediately.
     # ".gradle/gradle.properties".text = ''
@@ -125,16 +128,24 @@ in
 
   home.sessionVariables = {
     EDITOR = "nvim";
-    RUST_SRC_PATH = "${pkgs.rust.packages.stable.rustPlatform.rustLibSrc}";
+    RUST_SRC_PATH="$(rustc --print sysroot)/lib/rustlib/src/rust/library";
+    RUSTFLAGS="-C target-cpu=native -C link-arg=-fuse-ld=lld";
     OPENSSL_DIR = "${pkgs.openssl.dev}";
     OPENSSL_LIB_DIR = "${pkgs.openssl.out}/lib";
+    LIBCLANG_PATH = "${pkgs.libclang.lib}/lib";
+    BINDGEN_EXTRA_CLANG_ARGS = "-I${pkgs.glibc.dev}/include -I${pkgs.clang}/resource-root/include";
+    LD_LIBRARY_PATH = pkgs.lib.makeLibraryPath [
+      pkgs.stdenv.cc.cc
+      pkgs.openssl
+    ];
     CC = "${pkgs.gcc}/bin/gcc";
     CXX = "${pkgs.gcc}/bin/g++";
   };
 
   # Let Home Manager install and manage itself.
-  services.ssh-agent = {
-    enable = true;
+  services = {
+    ssh-agent.enable = true;
+    conky.enable = true;
   };
   programs = {
     home-manager.enable = true;
@@ -145,10 +156,24 @@ in
       enableZshIntegration = true;
     };
 
+    fastfetch.enable = true;
     fzf = {
       enable = true;
       enableZshIntegration = true;
+      defaultCommand = "rg --files --hidden --follow";
+      defaultOptions = [
+        "--height 40%"
+        "--layout=reverse"
+        "--border"
+        "--preview 'cat {}'"
+      ];
+      historyWidgetOptions = [
+        "--sort"
+        "--exact"
+      ];
     };
+
+    nix-your-shell.enable = true;
 
     zoxide = {
       enable = true;
@@ -157,9 +182,7 @@ in
 
     zsh = {
       enable = true;
-      autosuggestion = {
-        enable = true;
-      };
+      autosuggestion.enable = true;
       enableCompletion = true;
 
       plugins = [
@@ -169,10 +192,16 @@ in
         }
       ];
 
-      history.path = "~/.histfile";
-      history.size = 1000;
-      history.save = 1000;
+      history = {
+        path = "${config.home.homeDirectory}/.zsh_history"; # Explicit path
+        save = 50000;
+        size = 50000;
+        expireDuplicatesFirst = true;
+        extended = true;
+        share = true;  # Share history between sessions
+      };
 
+      # Aliases
       shellAliases = {
         mkdir = "mkdir -p";
       };
@@ -190,7 +219,32 @@ in
             command nvim "$@"                # Run Neovim with any passed arguments
             kitten @ set-spacing padding=25  # Restore padding to 25 after exiting Neovim
         }
+        # FZF configuration for better history search
+        export FZF_DEFAULT_OPTS="--height 40% --layout=reverse --border"
+        export FZF_CTRL_R_OPTS="--sort --exact"
+
+        # Ensure history is saved properly
+        setopt SHARE_HISTORY
+        setopt EXTENDED_HISTORY
+        setopt HIST_EXPIRE_DUPS_FIRST
+        setopt HIST_IGNORE_DUPS
+        setopt HIST_IGNORE_SPACE
+        setopt HIST_VERIFY
+
+        # Prevent the creation of backup files
+        setopt NO_CLOBBER
+
+        # Clean up any existing .~ directories
+        find . -name ".~" -type d -exec rm -rf {} +
       '';
+      oh-my-zsh = {
+        enable = true;
+        plugins = [
+          "history"
+          "dirhistory"
+          "git"
+        ];
+      };
     };
   };
 }

@@ -74,11 +74,11 @@
             echo "Cargo version: $(cargo --version)"
             echo "LLVM version: $(llvm-config --version)"
             echo "Rust source path: $RUST_SRC_PATH"
-            if [ ! -d "cache" ]; then
-                echo "Running initial setup..."
-                sh compile.sh
-                sh install.sh
-              fi
+            # if [ ! -d "cache" ]; then
+            #     echo "Running initial setup..."
+            #     sh compile.sh
+            #     sh install.sh
+            #   fi
           '';
         };
         
