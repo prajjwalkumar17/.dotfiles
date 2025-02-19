@@ -2,8 +2,7 @@
 
 # Take a screenshot and blur it
 MONITOR="DP-2"
-grim -o "$MONITOR" /tmp/lockscreen_tmp.png
-mv /tmp/lockscreen.png /tmp/lockscreen.png
+grim -o "$MONITOR" /tmp/lockscreen.png
 
 # Lock screen with blurred image
 swaylock \
