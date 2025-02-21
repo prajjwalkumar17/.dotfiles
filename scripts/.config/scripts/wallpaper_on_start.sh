@@ -35,12 +35,16 @@ MONITOR1="DP-2"
 MONITOR2="HDMI-A-1"
 
 # Define wallpaper directory
+# WALLPAPER_DIR="$HOME/.dotfiles/Wallpaper/Wallpaper/"
 WALLPAPER_DIR="$HOME/Wallpaper/"
 
 # Select a random wallpaper that is not currently loaded
 CURRENT_WALL=$(hyprctl hyprpaper listloaded)
 WALLPAPER=$(find "$WALLPAPER_DIR" -type f \( -iname "*.png" -o -iname "*.jpg" -o -iname "*.jpeg" \) ! -name "$(basename "$CURRENT_WALL")" | shuf -n 1)
-
+if [ -z "$WALLPAPER" ]; then
+    echo "No wallpaper found!"
+    exit 1
+fi
 # Preload and set wallpapers for each monitor
 hyprctl hyprpaper preload "$WALLPAPER"
 hyprctl hyprpaper wallpaper "$MONITOR1,$WALLPAPER"

@@ -1,7 +1,14 @@
 #!/usr/bin/env bash
 
+# Define wallpaper directory
+WALLPAPER_DIR="$HOME/.dotfiles/Wallpaper/Wallpaper/"
+
+# Select a random wallpaper that is not currently loaded
+CURRENT_WALL=$(hyprctl hyprpaper listloaded)
+WALLPAPER=$(find "$WALLPAPER_DIR" -type f \( -iname "*.png" -o -iname "*.jpg" -o -iname "*.jpeg" \) ! -name "$(basename "$CURRENT_WALL")" | shuf -n 1)
+
 swaylock \
-    --image ~/Wallpaper/demon.jpg \
+    --image "$WALLPAPER" \
     --clock \
     --indicator \
     --indicator-radius 200 \
