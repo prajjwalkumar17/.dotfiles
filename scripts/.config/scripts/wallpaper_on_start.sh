@@ -35,8 +35,7 @@ MONITOR1="DP-2"
 MONITOR2="HDMI-A-1"
 
 # Define wallpaper directory
-# WALLPAPER_DIR="$HOME/.dotfiles/Wallpaper/Wallpaper/"
-WALLPAPER_DIR="$HOME/Wallpaper/"
+WALLPAPER_DIR="$HOME/.dotfiles/Wallpaper/Wallpaper/"
 
 # Select a random wallpaper that is not currently loaded
 CURRENT_WALL=$(hyprctl hyprpaper listloaded)

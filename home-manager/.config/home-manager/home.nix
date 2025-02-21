@@ -92,12 +92,11 @@
     # # the Nix store. Activating the configuration will then make '~/.screenrc' a
     # # symlink to the Nix store copy.
     # ".screenrc".source = dotfiles/screenrc;
-    ".p10k.zsh".source = ~/.config/.p10k.zsh;
+    # ".p10k.zsh".source = ~/.config/.p10k.zsh;
     # ".zshrc".source = ~/.config/.zshrc;
 
 
-    # # You can also set the file content immediately.
-    # ".gradle/gradle.properties".text = ''
+    # # You can also set the file content immediately. ".gradle/gradle.properties".text = ''
     #   org.gradle.console=verbose
     #   org.gradle.daemon.idletimeout=3600000
     # '';
@@ -194,70 +193,70 @@
       enableZshIntegration = true;
     };
 
-    zsh = {
-      enable = false;
-      autosuggestion.enable = true;
-      enableCompletion = true;
-
-      plugins = [
-        {
-          name = "vi-mode";
-          src = pkgs.zsh-vi-mode;
-        }
-      ];
-
-      history = {
-        path = "${config.home.homeDirectory}/.zsh_history";
-        save = 50000;
-        size = 50000;
-        expireDuplicatesFirst = true;
-        extended = true;
-        share = true;
-      };
-
-      # Aliases
-      shellAliases = {
-        mkdir = "mkdir -p";
-      };
-
-      initExtra = ''
-        export PATH=$PATH:/home/hangsai/.cache/pokemon-icat
-        pokemon-icat -q
-        source $(find /nix/store -name "powerlevel10k.zsh-theme" | head -n 1)
-
-        # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
-        [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
-
-        nvim() {
-            kitten @ set-spacing padding=0   # Set padding to 0
-            command nvim "$@"                # Run Neovim with any passed arguments
-            kitten @ set-spacing padding=25  # Restore padding to 25 after exiting Neovim
-        }
-        # FZF configuration for better history search
-        export FZF_DEFAULT_OPTS="--height 40% --layout=reverse --border"
-        export FZF_CTRL_R_OPTS="--sort --exact"
-
-        # Ensure history is saved properly
-        setopt SHARE_HISTORY
-        setopt EXTENDED_HISTORY
-        setopt HIST_EXPIRE_DUPS_FIRST
-        setopt HIST_IGNORE_DUPS
-        setopt HIST_IGNORE_SPACE
-        setopt HIST_VERIFY
-        setopt NO_CLOBBER
-
-      '';
-      oh-my-zsh = {
-        enable = true;
-        plugins = [
-          "history"
-          "dirhistory"
-          "git"
-        ];
-      };
-    };
+    # zsh = {
+    #   enable = false;
+    #   autosuggestion.enable = true;
+    #   enableCompletion = true;
+    #
+    #   plugins = [
+    #     {
+    #       name = "vi-mode";
+    #       src = pkgs.zsh-vi-mode;
+    #     }
+    #   ];
+    #
+    #   history = {
+    #     path = "${config.home.homeDirectory}/.zsh_history";
+    #     save = 50000;
+    #     size = 50000;
+    #     expireDuplicatesFirst = true;
+    #     extended = true;
+    #     share = true;
+    #   };
+    #
+    #   # Aliases
+    #   shellAliases = {
+    #     mkdir = "mkdir -p";
+    #   };
+    #
+    #   initExtra = ''
+    #     export PATH=$PATH:/home/hangsai/.cache/pokemon-icat
+    #     pokemon-icat -q
+    #     source $(find /nix/store -name "powerlevel10k.zsh-theme" | head -n 1)
+    #
+    #     # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
+    #     [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+    #
+    #     nvim() {
+    #         kitten @ set-spacing padding=0   # Set padding to 0
+    #         command nvim "$@"                # Run Neovim with any passed arguments
+    #         kitten @ set-spacing padding=25  # Restore padding to 25 after exiting Neovim
+    #     }
+    #     # FZF configuration for better history search
+    #     export FZF_DEFAULT_OPTS="--height 40% --layout=reverse --border"
+    #     export FZF_CTRL_R_OPTS="--sort --exact"
+    #
+    #     # Ensure history is saved properly
+    #     setopt SHARE_HISTORY
+    #     setopt EXTENDED_HISTORY
+    #     setopt HIST_EXPIRE_DUPS_FIRST
+    #     setopt HIST_IGNORE_DUPS
+    #     setopt HIST_IGNORE_SPACE
+    #     setopt HIST_VERIFY
+    #     setopt NO_CLOBBER
+    #
+    #   '';
+    #   oh-my-zsh = {
+    #     enable = true;
+    #     plugins = [
+    #       "history"
+    #       "dirhistory"
+    #       "git"
+    #     ];
+    #   };
+    # };
   };
-  home.activation.linkMyFiles = config.lib.dag.entryAfter ["writeBoundary"] ''
-    ln -s ${toString ~/.config/.zshrc} ~/.zshrc
-  '';
+  # home.activation.linkMyFiles = config.lib.dag.entryAfter ["writeBoundary"] ''
+  #   ln -s ${toString ~/.config/.zshrc} ~/.zshrc
+  # '';
 }
