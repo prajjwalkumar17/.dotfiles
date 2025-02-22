@@ -1,4 +1,7 @@
 { config, pkgs, lib ? pkgs.lib, ... }:
+let
+  fenix = import (fetchTarball "https://github.com/nix-community/fenix/archive/main.tar.gz") { };
+in
 {
   # Home Manager needs a bit of information about you and the paths it should
   # manage.
@@ -48,11 +51,12 @@
     python3
     python3Packages.virtualenv
     python3Packages.pip
-    rustup
+    fenix.stable.toolchain
 
     # nvim
     fzf
     gnumake
+    gdb
     libtool
     neovim
     pkg-config
@@ -64,12 +68,15 @@
     lua-language-server
 
     # Common build dependencies
+    # binutils
     cmake
+    clang
+    just
     lld
     llvm
     # gcc
-    clang
     openssl
+    openssl.dev
     pkg-config
 
     # dev utilities
@@ -103,27 +110,34 @@
   };
 
 # Configure rustfmt
-  home.file.".rustfmt.toml".text = ''
-    max_width = 100
-    tab_spaces = 4
-    edition = "2021"
-  '';
-
+  # home.file.".rustfmt.toml".text = ''
+  #   max_width = 100
+  #   tab_spaces = 4
+  #   edition = "2021"
+  # '';
+  #
   # Cargo configuration with correct linker settings
-  home.file.".cargo/config.toml".text = ''
-    [target.x86_64-unknown-linux-gnu]
-    linker = "gcc"
-    rustflags = [
-      "-C", "link-arg=-fuse-ld=lld",
-      "-C", "target-feature=+crt-static"
-    ]
-
-    [build]
-    rustc-wrapper = "${pkgs.sccache}/bin/sccache"
-
-    [net]
-    git-fetch-with-cli = true
-  '';
+  # home.file.".cargo/config.toml".text = ''
+  #   [target.x86_64-unknown-linux-gnu]
+  #   linker = "gcc"
+  #   rustflags = [
+  #     "-C", "link-arg=-fuse-ld=lld",
+  #     "-C", "target-feature=+crt-static"
+  #   ]
+  #
+  #   [build]
+  #   rustc-wrapper = "${pkgs.sccache}/bin/sccache"
+  #
+  #   [net]
+  #   git-fetch-with-cli = true
+  # '';
+  # xdg.configFile."cargo/config.toml".text = ''
+  #   [build]
+  #   rustc-wrapper = "${pkgs.sccache}/bin/sccache"
+  #   [target.x86_64-unknown-linux-gnu]
+  #   linker = "gcc"
+  #   rustflags = ["--cfg", "procmacro2_semver_exempt"]
+  # '';
 
   # Home Manager can also manage your environment variables through
   # 'home.sessionVariables'. These will be explicitly sourced when using a
@@ -143,12 +157,14 @@
 
   home.sessionVariables = {
     EDITOR = "nvim";
-    RUST_SRC_PATH="$(rustc --print sysroot)/lib/rustlib/src/rust/library";
-    RUSTFLAGS="-C target-cpu=native -C link-arg=-fuse-ld=lld";
+    RUST_SRC_PATH = "${fenix.stable.rust-src}/lib/rustlib/src/rust/library";
+    RUSTFLAGS = "--cfg procmacro2_semver_exempt";
+    BINDGEN_EXTRA_CLANG_ARGS = "-I${pkgs.glibc.dev}/include -I${pkgs.clang.cc.lib}/lib/clang/${pkgs.clang.version}/include";
     OPENSSL_DIR = "${pkgs.openssl.dev}";
     OPENSSL_LIB_DIR = "${pkgs.openssl.out}/lib";
+    OPENSSL_INCLUDE_DIR = "${pkgs.openssl.dev}/include";
     LIBCLANG_PATH = "${pkgs.libclang.lib}/lib";
-    BINDGEN_EXTRA_CLANG_ARGS = "-I${pkgs.glibc.dev}/include -I${pkgs.clang}/resource-root/include";
+    PKG_CONFIG_PATH = "${pkgs.openssl.dev}/lib/pkgconfig";
     LD_LIBRARY_PATH = pkgs.lib.makeLibraryPath [
       pkgs.stdenv.cc.cc
       pkgs.openssl
