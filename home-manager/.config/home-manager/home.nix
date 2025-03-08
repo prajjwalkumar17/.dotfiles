@@ -107,39 +107,10 @@ in
     #   org.gradle.console=verbose
     #   org.gradle.daemon.idletimeout=3600000
     # '';
+    # ".config/containers/policy.json".source = ./containers/policy.json;
   };
 
-# Configure rustfmt
-  # home.file.".rustfmt.toml".text = ''
-  #   max_width = 100
-  #   tab_spaces = 4
-  #   edition = "2021"
-  # '';
-  #
-  # Cargo configuration with correct linker settings
-  # home.file.".cargo/config.toml".text = ''
-  #   [target.x86_64-unknown-linux-gnu]
-  #   linker = "gcc"
-  #   rustflags = [
-  #     "-C", "link-arg=-fuse-ld=lld",
-  #     "-C", "target-feature=+crt-static"
-  #   ]
-  #
-  #   [build]
-  #   rustc-wrapper = "${pkgs.sccache}/bin/sccache"
-  #
-  #   [net]
-  #   git-fetch-with-cli = true
-  # '';
-  # xdg.configFile."cargo/config.toml".text = ''
-  #   [build]
-  #   rustc-wrapper = "${pkgs.sccache}/bin/sccache"
-  #   [target.x86_64-unknown-linux-gnu]
-  #   linker = "gcc"
-  #   rustflags = ["--cfg", "procmacro2_semver_exempt"]
-  # '';
-
-  # Home Manager can also manage your environment variables through
+  # Home Manager activating the configuration...
   # 'home.sessionVariables'. These will be explicitly sourced when using a
   # shell provided by Home Manager. If you don't want to manage your shell
   # through Home Manager then you have to manually source 'hm-session-vars.sh'
@@ -208,71 +179,5 @@ in
       enable = true;
       enableZshIntegration = true;
     };
-
-    # zsh = {
-    #   enable = false;
-    #   autosuggestion.enable = true;
-    #   enableCompletion = true;
-    #
-    #   plugins = [
-    #     {
-    #       name = "vi-mode";
-    #       src = pkgs.zsh-vi-mode;
-    #     }
-    #   ];
-    #
-    #   history = {
-    #     path = "${config.home.homeDirectory}/.zsh_history";
-    #     save = 50000;
-    #     size = 50000;
-    #     expireDuplicatesFirst = true;
-    #     extended = true;
-    #     share = true;
-    #   };
-    #
-    #   # Aliases
-    #   shellAliases = {
-    #     mkdir = "mkdir -p";
-    #   };
-    #
-    #   initExtra = ''
-    #     export PATH=$PATH:/home/hangsai/.cache/pokemon-icat
-    #     pokemon-icat -q
-    #     source $(find /nix/store -name "powerlevel10k.zsh-theme" | head -n 1)
-    #
-    #     # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
-    #     [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
-    #
-    #     nvim() {
-    #         kitten @ set-spacing padding=0   # Set padding to 0
-    #         command nvim "$@"                # Run Neovim with any passed arguments
-    #         kitten @ set-spacing padding=25  # Restore padding to 25 after exiting Neovim
-    #     }
-    #     # FZF configuration for better history search
-    #     export FZF_DEFAULT_OPTS="--height 40% --layout=reverse --border"
-    #     export FZF_CTRL_R_OPTS="--sort --exact"
-    #
-    #     # Ensure history is saved properly
-    #     setopt SHARE_HISTORY
-    #     setopt EXTENDED_HISTORY
-    #     setopt HIST_EXPIRE_DUPS_FIRST
-    #     setopt HIST_IGNORE_DUPS
-    #     setopt HIST_IGNORE_SPACE
-    #     setopt HIST_VERIFY
-    #     setopt NO_CLOBBER
-    #
-    #   '';
-    #   oh-my-zsh = {
-    #     enable = true;
-    #     plugins = [
-    #       "history"
-    #       "dirhistory"
-    #       "git"
-    #     ];
-    #   };
-    # };
   };
-  # home.activation.linkMyFiles = config.lib.dag.entryAfter ["writeBoundary"] ''
-  #   ln -s ${toString ~/.config/.zshrc} ~/.zshrc
-  # '';
 }
