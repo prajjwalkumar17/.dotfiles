@@ -1,0 +1,6 @@
+# Ghostty main configuration
+font-family = "CaskaydiaCove Nerd Font Mono"
+font-size = 9.0
+
+# Use regular theme
+theme = regular

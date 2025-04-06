@@ -1,7 +1,4 @@
 { config, pkgs, lib ? pkgs.lib, ... }:
-let
-  fenix = import (fetchTarball "https://github.com/nix-community/fenix/archive/main.tar.gz") { };
-in
 {
   # Home Manager needs a bit of information about you and the paths it should
   # manage.
@@ -48,10 +45,12 @@ in
 
     # languages
     jdk23
+    nodejs
     python3
     python3Packages.virtualenv
     python3Packages.pip
-    fenix.stable.toolchain
+    rustup
+    yarn
 
     # nvim
     fzf
@@ -68,18 +67,24 @@ in
     lua-language-server
 
     # Common build dependencies
-    # binutils
     cmake
-    clang
     just
+    libiconv
     lld
     llvm
-    # gcc
+    clang
+    gcc-unwrapped
+    gnumake
     openssl
     openssl.dev
     pkg-config
+    protobuf
+    zlib
+    zlib.dev
 
     # dev utilities
+    atuin
+    ghostty
     git-extras
     git
     glibc
@@ -90,7 +95,18 @@ in
     wget
     stow
     unzip
-  ];
+
+    # networking
+    dig
+
+    # applications
+    slack
+    postman
+
+    # shells
+    (pkgs.writeShellScriptBin "rust-shell" ''
+      exec nix-shell ${config.home.homeDirectory}/.dotfiles/home-manager/.config/home-manager/shells/rust-shell.nix "$@"
+    '')  ];
 
   # Home Manager is pretty good at managing dotfiles. The primary way to manage
   # plain files is through 'home.file'.
@@ -128,20 +144,35 @@ in
 
   home.sessionVariables = {
     EDITOR = "nvim";
-    RUST_SRC_PATH = "${fenix.stable.rust-src}/lib/rustlib/src/rust/library";
-    RUSTFLAGS = "--cfg procmacro2_semver_exempt";
-    BINDGEN_EXTRA_CLANG_ARGS = "-I${pkgs.glibc.dev}/include -I${pkgs.clang.cc.lib}/lib/clang/${pkgs.clang.version}/include";
+    RUSTUP_HOME = "${config.home.homeDirectory}/.rustup";
+    CARGO_HOME = "${config.home.homeDirectory}/.cargo";
+    PATH = "$PATH:${config.home.homeDirectory}/.cargo/bin";
+    LIBCLANG_PATH = "${pkgs.libclang.lib}/lib";
+    BINDGEN_EXTRA_CLANG_ARGS = "-isystem ${pkgs.llvm}/lib/clang/${pkgs.llvm.version}/include";
     OPENSSL_DIR = "${pkgs.openssl.dev}";
     OPENSSL_LIB_DIR = "${pkgs.openssl.out}/lib";
-    OPENSSL_INCLUDE_DIR = "${pkgs.openssl.dev}/include";
-    LIBCLANG_PATH = "${pkgs.libclang.lib}/lib";
     PKG_CONFIG_PATH = "${pkgs.openssl.dev}/lib/pkgconfig";
-    LD_LIBRARY_PATH = pkgs.lib.makeLibraryPath [
-      pkgs.stdenv.cc.cc
-      pkgs.openssl
+    CC = "clang";
+    CXX = "clang++";
+
+    # Add library path
+    LD_LIBRARY_PATH = lib.makeLibraryPath [
+      pkgs.openssl.out
+      pkgs.libclang.lib
+      pkgs.stdenv.cc.cc.lib
+      pkgs.zlib
     ];
-    CC = "${pkgs.gcc}/bin/gcc";
-    CXX = "${pkgs.gcc}/bin/g++";
+    # Database settings if needed globally
+    DATABASE_URL = "postgres://postgres:postgres@localhost/hyperswitch"; 
+  };
+
+  home.activation = {
+  rustupInit = lib.hm.dag.entryAfter ["writeBoundary"] ''
+    if ! [ -d "$HOME/.rustup" ]; then
+      $DRY_RUN_CMD ${pkgs.rustup}/bin/rustup default stable
+      $DRY_RUN_CMD ${pkgs.rustup}/bin/rustup component add rustfmt clippy rust-src rust-analyzer
+    fi
+  '';
   };
 
   # Let Home Manager install and manage itself.
@@ -155,6 +186,7 @@ in
 
     direnv = {
       enable = true;
+      nix-direnv.enable = true;
       enableZshIntegration = true;
     };
 
