@@ -184,5 +184,10 @@ alias gr='git remote'
 alias grv='git remote -v'
 alias glo='git log --oneline'
 
+# Cargo aliases
+alias cc='cargo check'
+alias cr='cargo run'
+alias crd='cargo run --bin dynamo'
+
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
