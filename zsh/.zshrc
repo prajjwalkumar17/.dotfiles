@@ -1,5 +1,5 @@
 export PATH=$PATH:/home/hangsai/.cache/pokemon-icat
-# pokemon-icat -q
+pokemon-icat -q
 
 # Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
 # Initialization code that may require console input (password prompts, [y/n]
@@ -163,7 +163,7 @@ alias gaa='git add --all'
 alias gb='git branch'
 alias gbd='git branch -d'
 alias gc='git commit'
-alias gcm='git commit -m'
+alias gcam='git commit -am'
 alias gco='git checkout'
 alias gcb='git checkout -b'
 alias gd='git diff'
