@@ -94,6 +94,7 @@
     wl-clipboard
     wget
     stow
+    starship
     unzip
 
     # networking
