@@ -1,7 +1,4 @@
 { config, pkgs, lib ? pkgs.lib, ... }:
-let
-  fenix = import (fetchTarball "https://github.com/nix-community/fenix/archive/main.tar.gz") { };
-in
 {
   # Home Manager needs a bit of information about you and the paths it should
   # manage.
@@ -17,7 +14,7 @@ in
   # want to update the value, then make sure to first check the Home Manager
   # release notes.
   home.stateVersion = "24.11"; # Please read the comment before changing.
-
+  nixpkgs.config.allowUnfree = true;
   # home = {
   #   activation.setZshAsShell = config.lib.dag.entryAfter ["writeBoundary"] ''
   #     if [[ $SHELL != ${pkgs.zsh}/bin/zsh ]]; then
@@ -48,10 +45,12 @@ in
 
     # languages
     jdk23
+    nodejs
     python3
     python3Packages.virtualenv
     python3Packages.pip
-    fenix.stable.toolchain
+    rustup
+    yarn
 
     # nvim
     fzf
@@ -68,18 +67,24 @@ in
     lua-language-server
 
     # Common build dependencies
-    # binutils
     cmake
-    clang
     just
+    libiconv
     lld
     llvm
-    # gcc
+    clang
+    gcc-unwrapped
+    gnumake
     openssl
     openssl.dev
     pkg-config
+    protobuf
+    zlib
+    zlib.dev
 
     # dev utilities
+    atuin
+    ghostty
     git-extras
     git
     glibc
@@ -90,7 +95,18 @@ in
     wget
     stow
     unzip
-  ];
+
+    # networking
+    dig
+
+    # applications
+    slack
+    postman
+
+    # shells
+    (pkgs.writeShellScriptBin "rust-shell" ''
+      exec nix-shell ${config.home.homeDirectory}/.dotfiles/home-manager/.config/home-manager/shells/rust-shell.nix "$@"
+    '')  ];
 
   # Home Manager is pretty good at managing dotfiles. The primary way to manage
   # plain files is through 'home.file'.
@@ -107,39 +123,10 @@ in
     #   org.gradle.console=verbose
     #   org.gradle.daemon.idletimeout=3600000
     # '';
+    # ".config/containers/policy.json".source = ./containers/policy.json;
   };
 
-# Configure rustfmt
-  # home.file.".rustfmt.toml".text = ''
-  #   max_width = 100
-  #   tab_spaces = 4
-  #   edition = "2021"
-  # '';
-  #
-  # Cargo configuration with correct linker settings
-  # home.file.".cargo/config.toml".text = ''
-  #   [target.x86_64-unknown-linux-gnu]
-  #   linker = "gcc"
-  #   rustflags = [
-  #     "-C", "link-arg=-fuse-ld=lld",
-  #     "-C", "target-feature=+crt-static"
-  #   ]
-  #
-  #   [build]
-  #   rustc-wrapper = "${pkgs.sccache}/bin/sccache"
-  #
-  #   [net]
-  #   git-fetch-with-cli = true
-  # '';
-  # xdg.configFile."cargo/config.toml".text = ''
-  #   [build]
-  #   rustc-wrapper = "${pkgs.sccache}/bin/sccache"
-  #   [target.x86_64-unknown-linux-gnu]
-  #   linker = "gcc"
-  #   rustflags = ["--cfg", "procmacro2_semver_exempt"]
-  # '';
-
-  # Home Manager can also manage your environment variables through
+  # Home Manager activating the configuration...
   # 'home.sessionVariables'. These will be explicitly sourced when using a
   # shell provided by Home Manager. If you don't want to manage your shell
   # through Home Manager then you have to manually source 'hm-session-vars.sh'
@@ -157,20 +144,35 @@ in
 
   home.sessionVariables = {
     EDITOR = "nvim";
-    RUST_SRC_PATH = "${fenix.stable.rust-src}/lib/rustlib/src/rust/library";
-    RUSTFLAGS = "--cfg procmacro2_semver_exempt";
-    BINDGEN_EXTRA_CLANG_ARGS = "-I${pkgs.glibc.dev}/include -I${pkgs.clang.cc.lib}/lib/clang/${pkgs.clang.version}/include";
+    RUSTUP_HOME = "${config.home.homeDirectory}/.rustup";
+    CARGO_HOME = "${config.home.homeDirectory}/.cargo";
+    PATH = "$PATH:${config.home.homeDirectory}/.cargo/bin";
+    LIBCLANG_PATH = "${pkgs.libclang.lib}/lib";
+    BINDGEN_EXTRA_CLANG_ARGS = "-isystem ${pkgs.llvm}/lib/clang/${pkgs.llvm.version}/include";
     OPENSSL_DIR = "${pkgs.openssl.dev}";
     OPENSSL_LIB_DIR = "${pkgs.openssl.out}/lib";
-    OPENSSL_INCLUDE_DIR = "${pkgs.openssl.dev}/include";
-    LIBCLANG_PATH = "${pkgs.libclang.lib}/lib";
     PKG_CONFIG_PATH = "${pkgs.openssl.dev}/lib/pkgconfig";
-    LD_LIBRARY_PATH = pkgs.lib.makeLibraryPath [
-      pkgs.stdenv.cc.cc
-      pkgs.openssl
+    CC = "clang";
+    CXX = "clang++";
+
+    # Add library path
+    LD_LIBRARY_PATH = lib.makeLibraryPath [
+      pkgs.openssl.out
+      pkgs.libclang.lib
+      pkgs.stdenv.cc.cc.lib
+      pkgs.zlib
     ];
-    CC = "${pkgs.gcc}/bin/gcc";
-    CXX = "${pkgs.gcc}/bin/g++";
+    # Database settings if needed globally
+    DATABASE_URL = "postgres://postgres:postgres@localhost/hyperswitch"; 
+  };
+
+  home.activation = {
+  rustupInit = lib.hm.dag.entryAfter ["writeBoundary"] ''
+    if ! [ -d "$HOME/.rustup" ]; then
+      $DRY_RUN_CMD ${pkgs.rustup}/bin/rustup default stable
+      $DRY_RUN_CMD ${pkgs.rustup}/bin/rustup component add rustfmt clippy rust-src rust-analyzer
+    fi
+  '';
   };
 
   # Let Home Manager install and manage itself.
@@ -184,6 +186,7 @@ in
 
     direnv = {
       enable = true;
+      nix-direnv.enable = true;
       enableZshIntegration = true;
     };
 
@@ -208,71 +211,5 @@ in
       enable = true;
       enableZshIntegration = true;
     };
-
-    # zsh = {
-    #   enable = false;
-    #   autosuggestion.enable = true;
-    #   enableCompletion = true;
-    #
-    #   plugins = [
-    #     {
-    #       name = "vi-mode";
-    #       src = pkgs.zsh-vi-mode;
-    #     }
-    #   ];
-    #
-    #   history = {
-    #     path = "${config.home.homeDirectory}/.zsh_history";
-    #     save = 50000;
-    #     size = 50000;
-    #     expireDuplicatesFirst = true;
-    #     extended = true;
-    #     share = true;
-    #   };
-    #
-    #   # Aliases
-    #   shellAliases = {
-    #     mkdir = "mkdir -p";
-    #   };
-    #
-    #   initExtra = ''
-    #     export PATH=$PATH:/home/hangsai/.cache/pokemon-icat
-    #     pokemon-icat -q
-    #     source $(find /nix/store -name "powerlevel10k.zsh-theme" | head -n 1)
-    #
-    #     # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
-    #     [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
-    #
-    #     nvim() {
-    #         kitten @ set-spacing padding=0   # Set padding to 0
-    #         command nvim "$@"                # Run Neovim with any passed arguments
-    #         kitten @ set-spacing padding=25  # Restore padding to 25 after exiting Neovim
-    #     }
-    #     # FZF configuration for better history search
-    #     export FZF_DEFAULT_OPTS="--height 40% --layout=reverse --border"
-    #     export FZF_CTRL_R_OPTS="--sort --exact"
-    #
-    #     # Ensure history is saved properly
-    #     setopt SHARE_HISTORY
-    #     setopt EXTENDED_HISTORY
-    #     setopt HIST_EXPIRE_DUPS_FIRST
-    #     setopt HIST_IGNORE_DUPS
-    #     setopt HIST_IGNORE_SPACE
-    #     setopt HIST_VERIFY
-    #     setopt NO_CLOBBER
-    #
-    #   '';
-    #   oh-my-zsh = {
-    #     enable = true;
-    #     plugins = [
-    #       "history"
-    #       "dirhistory"
-    #       "git"
-    #     ];
-    #   };
-    # };
   };
-  # home.activation.linkMyFiles = config.lib.dag.entryAfter ["writeBoundary"] ''
-  #   ln -s ${toString ~/.config/.zshrc} ~/.zshrc
-  # '';
 }
