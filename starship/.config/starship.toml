@@ -1,3 +1,4 @@
+command_timeout = 2000  # Timeout in milliseconds (2 seconds)
 format = """
 [](#9A348E)\
 $os\
@@ -64,26 +65,26 @@ truncation_symbol = "…/"
 # So either put "Important Documents" before "Documents" or use the substituted version:
 # "Important 󰈙 " = " 󰈙 "
 
-[c]
-symbol = " "
-style = "bg:#86BBD8"
-format = '[ $symbol ($version) ]($style)'
-
-[docker_context]
-symbol = " "
-style = "bg:#06969A"
-format = '[ $symbol $context ]($style)'
-
-[elixir]
-symbol = " "
-style = "bg:#86BBD8"
-format = '[ $symbol ($version) ]($style)'
-
-[elm]
-symbol = " "
-style = "bg:#86BBD8"
-format = '[ $symbol ($version) ]($style)'
-
+# [c]
+# symbol = " "
+# style = "bg:#86BBD8"
+# format = '[ $symbol ]($style)'
+#
+# [docker_context]
+# symbol = " "
+# style = "bg:#06969A"
+# format = '[ $symbol $context ]($style)'
+#
+# [elixir]
+# symbol = " "
+# style = "bg:#86BBD8"
+# format = '[ $symbol ]($style)'
+#
+# [elm]
+# symbol = " "
+# style = "bg:#86BBD8"
+# format = '[ $symbol ]($style)'
+#
 [git_branch]
 symbol = "🌲 "
 style = "bg:#008000"
@@ -91,52 +92,52 @@ format = '[ $symbol $branch ]($style)'
 
 [git_status]
 style = "bg:#008000"
-format = '[$all_status$ahead_behind ]($style)'
-
-[golang]
-symbol = " "
-style = "bg:#86BBD8"
-format = '[ $symbol ($version) ]($style)'
-
-[gradle]
-style = "bg:#86BBD8"
-format = '[ $symbol ($version) ]($style)'
-
-[haskell]
-symbol = " "
-style = "bg:#86BBD8"
-format = '[ $symbol ($version) ]($style)'
-
-[java]
-symbol = " "
-style = "bg:#86BBD8"
-format = '[ $symbol ($version) ]($style)'
-
-[julia]
-symbol = " "
-style = "bg:#86BBD8"
-format = '[ $symbol ($version) ]($style)'
-
-[nodejs]
-symbol = ""
-style = "bg:#86BBD8"
-format = '[ $symbol ($version) ]($style)'
-
-[nim]
-symbol = "󰆥 "
-style = "bg:#86BBD8"
-format = '[ $symbol ($version) ]($style)'
-
+format = '[$all_status $ahead_behind ]($style)'
+#
+# [golang]
+# symbol = " "
+# style = "bg:#86BBD8"
+# format = '[ $symbol ]($style)'
+#
+# [gradle]
+# style = "bg:#86BBD8"
+# format = '[ $symbol ]($style)'
+#
+# [haskell]
+# symbol = " "
+# style = "bg:#86BBD8"
+# format = '[ $symbol ]($style)'
+#
+# [java]
+# symbol = " "
+# style = "bg:#86BBD8"
+# format = '[ $symbol ]($style)'
+#
+# [julia]
+# symbol = " "
+# style = "bg:#86BBD8"
+# format = '[ $symbol ]($style)'
+#
+# [nodejs]
+# symbol = ""
+# style = "bg:#86BBD8"
+# format = '[ $symbol ]($style)'
+#
+# [nim]
+# symbol = "󰆥 "
+# style = "bg:#86BBD8"
+# format = '[ $symbol ]($style)'
+#
 [rust]
+disabled = true
 symbol = ""
-style = "bg:#000000"
+style = "bg:#000000 fg:#fff"
+format = ''
+#
+# [scala]
+# symbol = " "
+# style = "bg:#86BBD8"
 # format = '[ $symbol ($version) ]($style)'
-format = '[ $symbol ]($style)'
-
-[scala]
-symbol = " "
-style = "bg:#86BBD8"
-format = '[ $symbol ($version) ]($style)'
 
 [time]
 disabled = false
