@@ -52,6 +52,9 @@
     rustup
     yarn
 
+    # databases
+    postgresql
+
     # nvim
     fzf
     gnumake

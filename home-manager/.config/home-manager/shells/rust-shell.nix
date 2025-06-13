@@ -33,8 +33,10 @@ pkgs.mkShell {
 
     alias cc='cargo check'
     alias cr='cargo run'
+    alias ccc='RUSTFLAGS="-Awarnings" cargo check'
+    alias ccr='RUSTFLAGS="-Awarnings" cargo run'
     alias c='clear && printf "\033c"'
 
-    echo "[rust-shell] Aliases available: 'cr' = cargo run, 'cc' = cargo check, 'c' = clear screen"
+    echo "[rust-shell] Aliases available: 'cr' = cargo run, 'cc' = cargo check, 'c' = clear screen, 'ccc' = cargo check without warnings, 'ccr' = cargo run without warnings"
   '';
 }

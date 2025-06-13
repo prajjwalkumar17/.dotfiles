@@ -178,6 +178,7 @@ alias glo='git log --oneline'
 alias cc='cargo check'
 alias cr='cargo run'
 alias crd='cargo run --bin dynamo'
+alias rs='rust-shell'
 
 
 # inits for applications
