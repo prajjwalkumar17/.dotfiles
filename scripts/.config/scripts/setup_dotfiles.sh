@@ -1,8 +1,12 @@
 #!/usr/bin/env bash
 
-set -e
+set -euo pipefail
 
 echo "📦 Starting Prajjwal's Dotfiles Setup..."
+
+# Base directory of the script
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+DOTFILES_DIR="$(dirname "$SCRIPT_DIR")"
 
 # ----------------------------------------
 # 1. Install Home Manager if not present
@@ -32,39 +36,40 @@ fi
 # 3. Run stow to symlink dotfiles
 # ----------------------------------------
 echo "🔗 Running stow.sh to symlink configs..."
-cd scripts/.config/scripts/
-sh stow.sh
-cd ..
+STOW_SCRIPT="$DOTFILES_DIR/scripts/.config/scripts/stow.sh"
+if [ -f "$STOW_SCRIPT" ]; then
+  bash "$STOW_SCRIPT"
+else
+  echo "❌ stow.sh not found at $STOW_SCRIPT"
+fi
 
 # ----------------------------------------
 # 4. Setup pokemon-icat if available
 # ----------------------------------------
-if [ -d "pokemon-icat/.config/pokemon-icat" ]; then
+POKE_DIR="$DOTFILES_DIR/pokemon-icat/.config/pokemon-icat"
+if [ -d "$POKE_DIR" ]; then
   echo "🧪 Setting up pokemon-icat..."
-  cd pokemon-icat/.config/pokemon-icat
+  cd "$POKE_DIR"
 
-  # Create Python venv
-  echo "🐍 Creating Python venv..."
-  python3 -m venv .venv
-  source .venv/bin/activate
+  # Skip setup if already done
+  if [ -d ".venv" ] && [ -x "$(command -v .venv/bin/python)" ] && [ -f "$HOME/.cache/pokemon-icat/pokemon-icat" ]; then
+    echo "✅ pokemon-icat already set up, skipping."
+  else
+    echo "🐍 Creating Python venv..."
+    python3 -m venv .venv
+    source .venv/bin/activate
 
-  # Install Python dependencies
-  echo "📦 Installing Python dependencies..."
-  pip install -r requirements.txt
+    echo "📦 Installing Python dependencies..."
+    pip install -r requirements.txt
 
-  # Compile Rust binary and install assets
-  echo "🔨 Compiling and installing pokemon-icat..."
-  sh compile.sh
-  sh install.sh
+    echo "🔨 Compiling and installing pokemon-icat..."
+    bash compile.sh
+    bash install.sh
+  fi
 
-  # Optionally update PATH
-  # echo 'export PATH=$PATH:$HOME/.cache/pokemon-icat' >> ~/.bashrc
-  # echo 'export PATH=$PATH:$HOME/.cache/pokemon-icat' >> ~/.zshrc
-
-  cd ../../../
-  echo "✅ pokemon-icat setup complete."
+  cd "$DOTFILES_DIR"
 else
-  echo "⚠️  pokemon-icat directory not found, skipping."
+  echo "⚠️  pokemon-icat directory not found at $POKE_DIR, skipping."
 fi
 
 echo "🎉 Dotfiles setup complete. You may now restart your terminal."
