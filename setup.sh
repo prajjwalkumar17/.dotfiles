@@ -45,6 +45,13 @@ else
 fi
 
 # ----------------------------------------
+# 3. Rebuild home-manager
+# ----------------------------------------
+echo "🔧 Rebuilding home-manager..."
+home-manager switch
+
+
+# ----------------------------------------
 # 4. Setup pokemon-icat if available
 # ----------------------------------------
 POKE_DIR="$DOTFILES_DIR/pokemon-icat/.config/pokemon-icat"
