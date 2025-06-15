@@ -4,9 +4,8 @@ set -euo pipefail
 
 echo "📦 Starting Prajjwal's Dotfiles Setup..."
 
-# Get the directory where the script is located
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-DOTFILES_DIR="$(dirname "$(dirname "$SCRIPT_DIR")")"
+# Root of the dotfiles repo (this script's directory)
+DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # ----------------------------------------
 # 1. Install Home Manager if not present
@@ -30,6 +29,8 @@ fi
 if ! command -v stow &> /dev/null; then
   echo "🔧 stow not found, installing via nix-shell..."
   nix-shell -p stow --run "echo ✅ stow ready"
+else
+  echo "✅ stow already installed."
 fi
 
 # ----------------------------------------
