@@ -39,7 +39,7 @@ fi
 echo "🔗 Running stow.sh to symlink configs..."
 STOW_SCRIPT="$DOTFILES_DIR/scripts/.config/scripts/stow.sh"
 if [ -f "$STOW_SCRIPT" ]; then
-  bash "$STOW_SCRIPT"
+  nix-shell -p stow --run "bash $STOW_SCRIPT"
 else
   echo "❌ stow.sh not found at $STOW_SCRIPT"
 fi
