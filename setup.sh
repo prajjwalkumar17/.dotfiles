@@ -181,6 +181,34 @@ else
   echo "✅ Remote already uses SSH or a custom URL:"
   git remote -v
 fi
+# some extra github sanity commands
+git config pull.rebase false
+
+# ----------------------------------------
+# 8. Clone personal Neovim config
+# ----------------------------------------
+NVIM_TARGET="$HOME/.config/nvim"
+NVIM_REPO="git@github.com:prajjwalkumar17/nvim.git"
+NVIM_BRANCH="nix-os"
+
+echo "📦 Checking for existing Neovim config at $NVIM_TARGET..."
+
+if [ -d "$NVIM_TARGET/.git" ]; then
+  echo "✅ Neovim config already exists at $NVIM_TARGET, skipping clone."
+else
+  echo "⬇️ Cloning Neovim config from $NVIM_REPO into $NVIM_TARGET..."
+  git clone "$NVIM_REPO" "$NVIM_TARGET"
+  echo "✅ Neovim config cloned."
+fi
+
+# Check out nix-os branch
+cd "$NVIM_TARGET"
+if git show-ref --verify --quiet "refs/heads/$NVIM_BRANCH" || git ls-remote --exit-code --heads origin "$NVIM_BRANCH" &>/dev/null; then
+  git checkout "$NVIM_BRANCH"
+  echo "✅ Checked out branch '$NVIM_BRANCH'"
+else
+  echo "⚠️ Branch '$NVIM_BRANCH' not found in remote. Skipping checkout."
+fi
 
 
 echo "🎉 Dotfiles setup complete. You may now restart your terminal."
