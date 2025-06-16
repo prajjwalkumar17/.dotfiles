@@ -1,3 +1,4 @@
+
 # 🛠️ Prajjwal's Dotfiles
 
 This repository contains my personal configuration for:
@@ -7,10 +8,12 @@ This repository contains my personal configuration for:
 - `pokemon-icat` for terminal Pokémon sprites
 - Home Manager dotfiles
 - Managed with `GNU Stow` for easy symlink setup on NixOS
+- ⚙️ Fully automated setup with `setup.sh`
 
 ---
 
 ## ✅ Prerequisites
+Note: not required if using setup.sh
 
 Install [Home Manager](https://nix-community.github.io/home-manager/) using Nix channels:
 
@@ -22,82 +25,50 @@ nix-shell '<home-manager>' -A install
 
 ---
 
-## 🚀 Installation
+## 🚀 Installation (One-liner)
 
-### 1. Clone this repo
-
-```sh
-git clone git@github.com:prajjwalkumar17/.dotfiles.git
-cd .dotfiles
-```
-
-### 2. Install `stow` (if not already)
+Run the following to clone and execute the setup:
 
 ```sh
-nix-shell -p stow
+git clone https://github.com/prajjwalkumar17/.dotfiles.git ~/.dotfiles && bash ~/.dotfiles/setup.sh
 ```
 
-### 3. Apply dotfiles using stow
-
-```sh
-cd scripts
-sh stow.sh
-```
-
-This will symlink config files (like `.zshrc`, `.config/nvim`, etc.) into your `$HOME` directory.
+This script automates the full setup process.
 
 ---
 
-## 🧪 Pokémon Terminal Viewer: `pokemon-icat`
+## ⚙️ What `setup.sh` Does
 
-A terminal-based Pokémon viewer written in Rust + Python.
+The `setup.sh` script performs the following:
 
-### 📦 Requirements
-
-- `cargo` and `python3.12+`
-- Terminal that supports images (e.g., `kitty`)
-
-### 🔧 Setup Instructions
-
-```sh
-# Clone the repo if not already
-cd ~/.dotfiles/pokemon-icat/.config/pokemon-icat
-
-# Create Python venv
-python3 -m venv .venv
-source .venv/bin/activate
-
-# Install Python dependencies
-pip install -r requirements.txt
-
-# Compile Rust binary and install assets
-sh compile.sh
-sh install.sh
-```
-
-### 🧭 Add binary to PATH (if needed)
-
-```sh
-export PATH=$PATH:$HOME/.cache/pokemon-icat
-```
-
-Now you can run:
-
-```sh
-pokemon-icat -q
-```
+1. **Home Manager**: Installs it if not already present
+2. **Stow**: Installs `stow` if missing, then runs `stow.sh` to symlink configs
+3. **Home Manager Switch**: Rebuilds the home-manager configuration
+4. **pokemon-icat**:
+   - Creates Python virtualenv
+   - Installs Python dependencies
+   - Compiles Rust binary
+   - Installs it to `~/.cache/pokemon-icat`
+5. **Screenshots**: Creates `~/Screenshots` directory
+6. **Git Identity Setup**:
+   - Prompts for `user.name` and `user.email` if not configured
+   - Generates and adds an SSH key
+   - Optionally uploads key to GitHub using a personal access token
+7. **Remote Conversion**: Converts `.dotfiles` repo remote from HTTPS to SSH
+8. **Neovim Setup**:
+   - Clones `git@github.com:prajjwalkumar17/nvim.git` into `~/.config/nvim`
+   - Checks out the `nix-os` branch
 
 ---
 
-## 🌟 Optional: Use Starship Prompt
+## 🔧 Customization
 
-If Powerlevel10k is slow or not installed, use `starship`:
+You can change the following by editing `setup.sh`:
 
-```sh
-starship preset pastel-powerline -o ~/.config/starship.toml
-```
-
-Then make sure `~/.config/starship.toml` is sourced in your `.zshrc` or `.bashrc`.
+- GitHub email & name prompts
+- Neovim clone target or branch
+- Whether SSH key is uploaded
+- Location of Pokémon venv or cache
 
 ---
 
@@ -110,17 +81,11 @@ Then make sure `~/.config/starship.toml` is sourced in your `.zshrc` or `.bashrc
 ├── zsh/                    # zsh + Powerlevel10k config
 ├── pokemon-icat/           # Pokémon terminal sprite viewer
 ├── starship.toml           # Optional Starship prompt config
-└── scripts/
-    └── stow.sh             # Stow all configs to $HOME
+├── scripts/
+│   └── stow.sh             # Stow all configs to $HOME
+├── setup.sh                # 🔁 Fully automated setup script
+└── .gitignore              # Clean build cache and venv ignores
 ```
-
----
-
-## 🧼 Notes
-
-- Configs are tailored for **NixOS** and `home-manager`.
-- If using flakes, you’ll need to adapt `flake.nix` (not provided here).
-- Powerlevel10k may slow down large prompts; use Starship if needed.
 
 ---
 
