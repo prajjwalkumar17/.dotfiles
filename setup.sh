@@ -95,5 +95,72 @@ else
   echo "✅ ~/Screenshots already exists."
 fi
 
+# ----------------------------------------
+# 6. Configure Git identity and SSH access
+# ----------------------------------------
+echo "🔧 Setting up Git identity and SSH key..."
+
+# Prompt for git user.name if not set
+if ! git config --global user.name &>/dev/null; then
+  read -rp "👤 Enter your Git user.name: " GIT_NAME
+  git config --global user.name "$GIT_NAME"
+else
+  echo "✅ Git user.name is already set to: $(git config --global user.name)"
+fi
+
+# Prompt for git user.email if not set
+if ! git config --global user.email &>/dev/null; then
+  read -rp "📧 Enter your Git user.email: " GIT_EMAIL
+  git config --global user.email "$GIT_EMAIL"
+else
+  echo "✅ Git user.email is already set to: $(git config --global user.email)"
+fi
+
+echo "✅ Final Git identity:"
+git config --global --get user.name
+git config --global --get user.email
+
+# Setup SSH key if not already present
+SSH_KEY="$HOME/.ssh/id_ed25519"
+if [ ! -f "$SSH_KEY" ]; then
+  echo "🔐 SSH key not found. Generating..."
+  mkdir -p "$HOME/.ssh"
+  ssh-keygen -t ed25519 -C "$(git config --global user.email)" -f "$SSH_KEY" -N ""
+  echo "✅ SSH key generated."
+else
+  echo "✅ SSH key already exists at $SSH_KEY"
+fi
+
+# Add to ssh-agent
+echo "🔑 Adding SSH key to ssh-agent..."
+eval "$(ssh-agent -s)" >/dev/null
+ssh-add "$SSH_KEY"
+
+# Show key for manual copy
+echo ""
+echo "📋 Your SSH public key (copy it to GitHub → Settings → SSH Keys):"
+echo "-----------------------------------------------------------------"
+cat "$SSH_KEY.pub"
+echo "-----------------------------------------------------------------"
+echo ""
+
+# Optionally upload to GitHub via API
+read -rp "🪪 Do you want to upload this key to GitHub automatically? (y/N): " upload_choice
+if [[ "$upload_choice" =~ ^[Yy]$ ]]; then
+  read -rp "🔑 Enter your GitHub personal access token (with 'admin:public_key' scope): " GITHUB_TOKEN
+  read -rp "📝 Enter a title for this key (e.g., hangsai-nixos): " KEY_TITLE
+
+  PUB_KEY_CONTENT=$(cat "$SSH_KEY.pub")
+
+  curl -s -H "Authorization: token $GITHUB_TOKEN" \
+       -H "Content-Type: application/json" \
+       -d "{\"title\": \"$KEY_TITLE\", \"key\": \"$PUB_KEY_CONTENT\"}" \
+       https://api.github.com/user/keys | jq '.'
+
+  echo "✅ SSH key uploaded to GitHub."
+else
+  echo "🧷 Skipped GitHub key upload."
+fi
+
 
 echo "🎉 Dotfiles setup complete. You may now restart your terminal."
