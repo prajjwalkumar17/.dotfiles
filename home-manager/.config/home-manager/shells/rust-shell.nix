@@ -26,10 +26,27 @@ pkgs.mkShell {
     export PGSOCKETDIR=$PGDATA/socket
     export PATH=${pkgs.postgresql_16}/bin:$PATH
 
-    mkdir -p "$PGDATA" "$PGSOCKETDIR"
+    # 🔒 Ensure both PGDATA and socket dir exist and are secure
+    if [ ! -d "$PGDATA" ]; then
+      mkdir -p "$PGDATA"
+    fi
+
+    if [ ! -d "$PGSOCKETDIR" ]; then
+      echo "[rust-shell] Creating PGSOCKETDIR: $PGSOCKETDIR"
+      mkdir -p "$PGSOCKETDIR"
+      chmod 700 "$PGSOCKETDIR"
+    fi
 
     if [ ! -f "$PGDATA/PG_VERSION" ]; then
       echo "[rust-shell] Initializing PostgreSQL data directory at $PGDATA..."
+
+      # If PGDATA exists but is not a valid cluster, clear it
+      if [ -d "$PGDATA" ] && [ -n "$(ls -A "$PGDATA")" ]; then
+        echo "[rust-shell] Warning: PGDATA exists but is not a valid cluster. Cleaning it..."
+        rm -rf "$PGDATA"
+        mkdir -p "$PGDATA"
+      fi
+
       initdb -D "$PGDATA"
     fi
 
