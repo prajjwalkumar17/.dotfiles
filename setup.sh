@@ -67,7 +67,11 @@ if [ -d "$POKE_DIR" ]; then
     source .venv/bin/activate
 
     echo "📦 Installing Python dependencies..."
-    pip install -r ../requirements.txt
+    if [ ! -f requirements.txt ]; then
+      echo "❌ requirements.txt not found in $PWD"
+      exit 1
+    fi
+    pip install -r requirements.txt
 
     echo "🔨 Compiling and installing pokemon-icat..."
     bash compile.sh
@@ -78,5 +82,18 @@ if [ -d "$POKE_DIR" ]; then
 else
   echo "⚠️  pokemon-icat directory not found at $POKE_DIR, skipping."
 fi
+
+# ----------------------------------------
+# 5. Create Screenshots directory in ~
+# ----------------------------------------
+SCREENSHOT_DIR="$HOME/Screenshots"
+if [ ! -d "$SCREENSHOT_DIR" ]; then
+  echo "🖼️ Creating ~/Screenshots directory..."
+  mkdir -p "$SCREENSHOT_DIR"
+  echo "✅ ~/Screenshots created."
+else
+  echo "✅ ~/Screenshots already exists."
+fi
+
 
 echo "🎉 Dotfiles setup complete. You may now restart your terminal."
