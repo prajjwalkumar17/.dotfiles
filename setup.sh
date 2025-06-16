@@ -162,5 +162,25 @@ else
   echo "🧷 Skipped GitHub key upload."
 fi
 
+# ----------------------------------------
+# 7. Convert dotfiles repo remote from HTTPS to SSH
+# ----------------------------------------
+echo "🔄 Checking dotfiles remote URL..."
+
+cd "$DOTFILES_DIR"
+
+CURRENT_REMOTE=$(git remote get-url origin)
+
+if [[ "$CURRENT_REMOTE" == https://github.com/* ]]; then
+  SSH_REMOTE="${CURRENT_REMOTE/https:\/\/github.com\//git@github.com:}"
+
+  git remote set-url origin "$SSH_REMOTE"
+  echo "✅ Remote URL updated to SSH:"
+  git remote -v
+else
+  echo "✅ Remote already uses SSH or a custom URL:"
+  git remote -v
+fi
+
 
 echo "🎉 Dotfiles setup complete. You may now restart your terminal."
