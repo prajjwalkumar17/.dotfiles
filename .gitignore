@@ -1,22 +1,27 @@
-# Ignore Python virtual environments
-pokemon-icat/.config/pokemon-icat/.venv
-
-# Ignore compiled Python cache
+# --- Python ---
 **/__pycache__/
-**/*.pyc
-**/*.pyo
+**/.mypy_cache/
+**/.ruff_cache/
+**/.venv/
+**/venv/
 
-# Ignore build artifacts
-pokemon-icat/.config/pokemon-icat/bin/
-pokemon-icat/.config/pokemon-icat/*.egg-info/
-pokemon-icat/.config/pokemon-icat/.mypy_cache/
+# --- Rust ---
+**/target/
+**/Cargo.lock
 
-# Ignore local caches
-.cache/
+# --- Binary ---
+**/bin/pokemon-icat
+
+# --- Virtualenvs ---
+**/.venv/
+
+# --- Logs and caches ---
 *.log
+.cache/
 
-# Ignore screenshots (if stored locally for previews/testing)
+# --- Screenshots or generated assets ---
 Screenshots/
 
-# Ignore Rust build artifacts (if built via cargo)
-target/
+# --- Editor/OS files ---
+*.swp
+.DS_Store
