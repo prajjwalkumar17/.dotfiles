@@ -4,6 +4,7 @@ pkgs.mkShell {
   name = "rust-shell";
 
   buildInputs = with pkgs; [
+    atuin
     clang
     diesel-cli
     gnumake
@@ -19,8 +20,6 @@ pkgs.mkShell {
 
   shellHook = ''
     export CARGO_HOME=$HOME/.cargo
-  2025-06-17T10:10:19.393387Z  INFO  OpenRouter started [Server { host: "127.0.0.1", port: 8080 }] [Log { console: LogConsole { enabled: true, level: Level(Level(Debug)), log_format: Default, filtering_directive: None } }], category: "SERVER"
-    at src/app.rs:208
     export RUSTUP_HOME=$HOME/.rustup
     export LIBCLANG_PATH=${pkgs.llvmPackages.libclang.lib}/lib
     export LD_LIBRARY_PATH=$LIBCLANG_PATH:$LD_LIBRARY_PATH
@@ -129,6 +128,34 @@ pkgs.mkShell {
     alias c='clear && printf "\033c"'
     alias q='exit'
 
+    # Git aliases
+    alias g='git'
+    alias ga='git add'
+    alias gaa='git add --all'
+    alias gb='git branch'
+    alias gbd='git branch -d'
+    alias gc='git commit'
+    alias gcam='git commit -am'
+    alias gco='git checkout'
+    alias gcb='git checkout -b'
+    alias gd='git diff'
+    alias gf='git fetch'
+    alias gpl='git pull'
+    alias gp='git push'
+    alias gpo='git push origin'
+    alias gpom='git push origin main'
+    alias gs='git status'
+    alias gst='git stash'
+    alias gstp='git stash pop'
+    alias glog='git log --oneline --decorate --graph'
+    alias grh='git reset --hard'
+    alias grb='git rebase'
+    alias grbi='git rebase -i'
+    alias gm='git merge'
+    alias gr='git remote'
+    alias grv='git remote -v'
+    alias glo='git log --oneline'
+    
     alias nuke_pg='
       echo "[nuke_pg] Stopping PostgreSQL..."; \
       pg_ctl -D "$PGDATA" stop || true; \
@@ -136,6 +163,22 @@ pkgs.mkShell {
       rm -rf "$PGDATA"; \
       echo "[nuke_pg] Done. Reopen rust-shell to reinitialize everything."
     '
+
+    # Atuin history support for Bash
+    if [ -z "$ATUIN_SESSION" ]; then
+      export ATUIN_NOBIND=true
+      eval "$(atuin init bash)"
+    fi
+
+    # Ensure .bashrc exists and has Atuin init for login shells too
+    if ! grep -q 'atuin init bash' "$HOME/.bashrc" 2>/dev/null; then
+      echo 'eval "$(atuin init bash)"' >> "$HOME/.bashrc"
+    fi
+
+    # Re-source .bashrc to activate Atuin history search (↑/Ctrl+R) inside nix-shell
+    if [ -f "$HOME/.bashrc" ]; then
+      source "$HOME/.bashrc"
+    fi
 
     echo "[rust-shell] PostgreSQL ready → psql hyperswitch_db"
     echo "[rust-shell] Redis ready → redis-cli -p $REDIS_PORT"
