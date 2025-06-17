@@ -16,6 +16,7 @@ pkgs.mkShell {
     postgresql_16
     redis
     rustup
+    sccache
   ];
 
   shellHook = ''
@@ -24,6 +25,11 @@ pkgs.mkShell {
     export LIBCLANG_PATH=${pkgs.llvmPackages.libclang.lib}/lib
     export LD_LIBRARY_PATH=$LIBCLANG_PATH:$LD_LIBRARY_PATH
     export BINDGEN_EXTRA_CLANG_ARGS="-isystem ${pkgs.glibc.dev}/include -isystem ${pkgs.glibc.dev}/lib/gcc/*/*/include -isystem ${pkgs.glibc.dev}/lib/gcc/*/*/include-fixed -isystem ${pkgs.glibc.dev}/include-fixed"
+    export RUSTC_WRAPPER=$(which sccache)
+    export SCCACHE_DIR="$HOME/.cache/sccache"
+    export SCCACHE_IDLE_TIMEOUT=1200
+    export SCCACHE_CACHE_SIZE="5G"
+    echo "[rust-shell] sccache is enabled → artifacts will be cached."
 
     export PGDATA=$HOME/.local/pgdata
     export PGSOCKETDIR=$PGDATA/socket
@@ -155,7 +161,7 @@ pkgs.mkShell {
     alias gr='git remote'
     alias grv='git remote -v'
     alias glo='git log --oneline'
-    
+
     alias nuke_pg='
       echo "[nuke_pg] Stopping PostgreSQL..."; \
       pg_ctl -D "$PGDATA" stop || true; \
@@ -164,20 +170,35 @@ pkgs.mkShell {
       echo "[nuke_pg] Done. Reopen rust-shell to reinitialize everything."
     '
 
-    # Atuin history support for Bash
+    # Safe bash history setup
+    if [ ! -f "$HOME/.bash_history" ]; then
+      > "$HOME/.bash_history"
+    fi
+
+    export HISTFILE="$HOME/.bash_history"
+    export HISTSIZE=100000
+    export HISTFILESIZE=200000
+    export HISTCONTROL=ignoredups:erasedups
+    shopt -s histappend
+    PROMPT_COMMAND="history -a; history -c; history -r; $PROMPT_COMMAND"
+
+    # Atuin initialization (avoid rebinding keys manually)
     if [ -z "$ATUIN_SESSION" ]; then
       export ATUIN_NOBIND=true
       eval "$(atuin init bash)"
     fi
 
-    # Ensure .bashrc exists and has Atuin init for login shells too
-    if ! grep -q 'atuin init bash' "$HOME/.bashrc" 2>/dev/null; then
-      echo 'eval "$(atuin init bash)"' >> "$HOME/.bashrc"
+    # Import bash history into Atuin at shell startup (NOT just at exit)
+    if [ -f "$HISTFILE" ]; then
+      atuin import --shell bash "$HISTFILE" --no-setup &>/dev/null
     fi
 
-    # Re-source .bashrc to activate Atuin history search (↑/Ctrl+R) inside nix-shell
-    if [ -f "$HOME/.bashrc" ]; then
-      source "$HOME/.bashrc"
+    # Atuin import again at shell exit to sync new commands
+    trap '[ -f "$HISTFILE" ] && atuin import --shell bash "$HISTFILE" --no-setup &>/dev/null' EXIT
+
+    # Save init for login shells
+    if ! grep -q 'atuin init bash' "$HOME/.bashrc" 2>/dev/null; then
+      echo 'eval "$(atuin init bash)"' >> "$HOME/.bashrc"
     fi
 
     echo "[rust-shell] PostgreSQL ready → psql hyperswitch_db"
