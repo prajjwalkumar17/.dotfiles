@@ -14,6 +14,8 @@ pkgs.mkShell {
     openssl
     pkg-config
     postgresql_16
+    python3
+    python3Packages.requests
     redis
     rustup
     sccache
@@ -126,12 +128,24 @@ pkgs.mkShell {
       rustup component add clippy rustfmt
     fi
 
+    # Ensure nightly toolchain and rustfmt are installed for cnf
+    if ! rustup show | grep -q "nightly"; then
+      echo "[rust-shell] Installing nightly toolchain..."
+      rustup install nightly
+    fi
+
+    if ! rustup component list --toolchain nightly | grep -q "rustfmt.*(installed)"; then
+      echo "[rust-shell] Installing rustfmt for nightly..."
+      rustup component add rustfmt --toolchain nightly
+    fi
+
     # Aliases
     alias cc='cargo check'
     alias cr='cargo run'
     alias ccc='RUSTFLAGS="-Awarnings" cargo check'
     alias ccr='RUSTFLAGS="-Awarnings" cargo run'
     alias c='clear && printf "\033c"'
+    alias cnf='cargo +nightly fmt'
     alias q='exit'
 
     # Git aliases
@@ -203,6 +217,6 @@ pkgs.mkShell {
 
     echo "[rust-shell] PostgreSQL ready → psql hyperswitch_db"
     echo "[rust-shell] Redis ready → redis-cli -p $REDIS_PORT"
-    echo "[rust-shell] Aliases: q, cr, cc, ccc, ccr, c, nuke_pg"
+    echo "[rust-shell] Aliases: q, cr, cc, ccc, ccr, cnf, c, nuke_pg"
   '';
 }
