@@ -42,6 +42,7 @@
     #   echo "Hello, ${config.home.username}!"
     # '')
     direnv
+    discord
 
     # languages
     jdk23
@@ -70,6 +71,7 @@
     lua-language-server
 
     # Common build dependencies
+    caddy
     cmake
     just
     libiconv
@@ -78,6 +80,7 @@
     clang
     gcc-unwrapped
     gnumake
+    mkcert
     openssl
     openssl.dev
     pkg-config
