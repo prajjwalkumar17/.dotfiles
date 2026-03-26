@@ -147,6 +147,7 @@ alias kl='kubectl logs'
 alias ka='kubectl apply -f'
 
 # Git aliases
+alias gitswitch='~/.config/scripts/github-switch.sh'
 alias g='git'
 alias ga='git add'
 alias gaa='git add --all'
@@ -182,8 +183,8 @@ alias rs='rust-shell'
 
 # ollama aliases
 # alias agent='ollama run qwen2.5-coder:14b'
-alias llama-qwen='llama-server -m ~/models/gguf/qwen2.5-7b-instruct-q4_k_m.gguf --host 127.0.0.1 --port 8000 -ngl 999 -c 18096 --alias qwen2.5-7b-instruct --jinja'
-alias llama-openai='llama-server -m ~/models/gguf/OpenAI-gpt-oss-20B-Claude-4.5-Opus-Heretic-Uncensored.i1-Q6_K.gguf --host 127.0.0.1 --port 8000 -ngl 4 -c 14096 -t 10 --alias openai-gpt-oss-20b --jinja'
+# alias llama-qwen='llama-server -m ~/models/gguf/qwen2.5-7b-instruct-q4_k_m.gguf --host 127.0.0.1 --port 8000 -ngl 999 -c 18096 --alias qwen2.5-7b-instruct --jinja'
+# alias llama-openai='llama-server -m ~/models/gguf/OpenAI-gpt-oss-20B-Claude-4.5-Opus-Heretic-Uncensored.i1-Q6_K.gguf --host 127.0.0.1 --port 8000 -ngl 4 -c 14096 -t 10 --alias openai-gpt-oss-20b --jinja'
 
 # inits for applications
 eval "$(zoxide init zsh)"
