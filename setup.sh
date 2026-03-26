@@ -13,7 +13,7 @@ DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 if ! command -v home-manager &> /dev/null; then
   echo "🔧 Installing Home Manager..."
 
-  nix-channel --add https://github.com/nix-community/home-manager/archive/release-24.11.tar.gz home-manager
+  nix-channel --add https://github.com/nix-community/home-manager/archive/release-25.11.tar.gz home-manager
   nix-channel --update
   nix-shell '<home-manager>' -A install
   home-manager switch

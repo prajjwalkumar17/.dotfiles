@@ -45,7 +45,6 @@
     discord
 
     # languages
-    jdk23
     nodejs
     python3
     python3Packages.virtualenv
@@ -102,6 +101,12 @@
     stow
     starship
     unzip
+    tailscale
+
+    # AI
+    uv
+    codex
+    antigravity
 
     # networking
     dig

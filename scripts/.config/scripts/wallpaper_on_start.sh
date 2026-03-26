@@ -32,7 +32,7 @@ fi
 
 # Get connected monitors (you can check with `hyprctl monitors`)
 MONITOR1="DP-2"
-MONITOR2="HDMI-A-1"
+MONITOR2="DP-1"
 
 # Define wallpaper directory
 WALLPAPER_DIR="$HOME/.dotfiles/Wallpaper/Wallpaper/"
